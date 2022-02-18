@@ -1,0 +1,74 @@
+seed_base: 2
+grad_clip: 5
+
+model:
+    type: NACSearchSpace
+    kwargs:
+        in_dim: 500
+        out_dim: 3
+        hidden_size: 32
+        num_layers: 3
+        dropout: 0.6
+        epsilon: 0.0
+        with_conv_linear: False
+        fix_last: False
+        _NA_PRIMITIVES: ['mlp',
+                        'gcn',
+                        'gat',
+                        'gat_sym',
+                        'gat_linear',
+                        'gat_cos',
+                        'gat_generalized_linear',
+                        'geniepath',
+                        'sage',
+                        'sage_sum',
+                        'sage_max',
+                        'gin_0',
+                        'chebconv_5',]
+        _SC_PRIMITIVES: ['none']
+        _LA_PRIMITIVES: ['l_concat']
+        with_bn: False
+        initializer: orthogonal
+
+nas:
+    type: nac
+    updata_weight: True
+    kwargs:
+        config:
+            momentum: 0.9
+            weight_decay: 0.0005
+            arch_learning_rate: 0.0003
+            arch_weight_decay: 0.001
+            unrolled: False
+            sparse:
+                norm: 1
+                lambda: 0.8
+                sc_sparse: False
+                la_sparse: False
+
+optimizer:
+    type: SGD
+    kwargs:
+        lr: 0.025
+        weight_decay: 0.0005
+        # nesterov: True
+        # momentum: 0.9
+
+lr_scheduler:
+    type: CosineAnnealingLR
+    kwargs:
+        T_max: 100
+        eta_min: 0.001
+        last_epoch: -1
+
+data:
+    task: PubMed
+    max_epoch: 100
+
+saver:                                # saving or loading details
+    print_freq: 10                    # frequence of printing logger
+    val_epoch_freq: 1
+    val_freq: 500                    # frequence of evaluating during training
+    save_many: False                   # whether to save checkpoints after every evaluation
+    #pretrain:
+       #path: ./checkpoints/ckpt.pth.tar

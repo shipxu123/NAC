@@ -1,0 +1,13 @@
+*.swp
+*.pyc
+*.ipynb
+__pycache__
+checkpoints
+events
+log.txt
+results
+log.train.default*
+**.DS_Store**
+.env
+.idea/
+debug/
