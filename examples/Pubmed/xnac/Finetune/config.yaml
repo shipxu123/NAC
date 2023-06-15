@@ -63,6 +63,7 @@ lr_scheduler:
         last_epoch: -1
 
 data:
+    root: /mnt/home/pxu22/data/nac/
     task: PubMed
     max_epoch: 100
 

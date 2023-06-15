@@ -4,11 +4,11 @@ grad_clip: 5
 model:
     type: NACSearchSpace
     kwargs:
-        in_dim: 500
-        out_dim: 3
+        in_dim: 1433
+        out_dim: 7
         hidden_size: 32
         num_layers: 3
-        dropout: 0.6
+        dropout: 0.5
         epsilon: 0.0
         with_conv_linear: False
         fix_last: False
@@ -31,6 +31,7 @@ model:
 
 nas:
     type: nac
+    updata_weight: True
     kwargs:
         config:
             momentum: 0.9
@@ -38,6 +39,11 @@ nas:
             arch_learning_rate: 0.0003
             arch_weight_decay: 0.001
             unrolled: False
+            sparse:
+                norm: 1
+                lambda: 0.001
+                sc_sparse: False
+                la_sparse: False
 
 optimizer:
     type: SGD
@@ -55,7 +61,8 @@ lr_scheduler:
         last_epoch: -1
 
 data:
-    task: PubMed
+    root: /mnt/home/pxu22/data/nac/
+    task: Cora
     max_epoch: 100
 
 saver:                                # saving or loading details
@@ -63,5 +70,5 @@ saver:                                # saving or loading details
     val_epoch_freq: 1
     val_freq: 500                    # frequence of evaluating during training
     save_many: False                   # whether to save checkpoints after every evaluation
-    #pretrain:
-       #path: ./checkpoints/ckpt.pth.tar
+    # pretrain:
+    #    path: ./checkpoints/ckpt.pth.tar

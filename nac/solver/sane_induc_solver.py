@@ -11,15 +11,18 @@ from tensorboardX import SummaryWriter
 import torch
 from torch.autograd import Variable
 
+from torch_geometric.datasets import Planetoid, Amazon, Coauthor, CoraFull, Reddit, PPI
+from torch_geometric.utils import add_self_loops
+
 from nac.utils.misc import accuracy, load_state_variable, save_load_split, gen_uniform_60_20_20_split
 
 from nac.controller import controller_entry
 from .induc_solver import InductiveSolver
 
-class NACInductiveSolver(InductiveSolver):
+class SANEInductiveSolver(InductiveSolver):
 
     def __init__(self, config_file):
-        super(NACInductiveSolver, self).__init__(config_file)
+        super(SANEInductiveSolver, self).__init__(config_file)
 
         # set up NAS controller
         self.controller = controller_entry(self.config.nas)
@@ -28,12 +31,43 @@ class NACInductiveSolver(InductiveSolver):
         self.controller.init_optimizer()
 
     def build_model(self):
-        super(NACInductiveSolver, self).build_model()
+        super(SANEInductiveSolver, self).build_model()
 
         if getattr(self.model, 'arch_parameters', False) and 'arch_parameters' in self.state:
             arch_parameters = self.model.arch_parameters()
             for i, state in enumerate(self.state['arch_parameters']):
                 load_state_variable(arch_parameters[i], state)
+
+    def build_data(self):
+        """
+        Specific for Iuductive tasks
+        """
+        if not getattr(self.config.data, 'max_epoch', False):
+            self.config.data.max_epoch = self.config.lr_scheduler.kwargs.T_max
+
+        if self.config.data.task == 'Amazon_Computers':
+            dataset = Amazon(os.path.join(self.config.data.root, 'Amazon_Computers'), 'Computers')
+        elif self.config.data.task == 'Coauthor_Physics':
+            dataset = Coauthor(os.path.join(self.config.data.root, 'Coauthor_Physics'), 'Physics')
+        elif self.config.data.task == 'Coauthor_CS':
+            dataset = Coauthor(os.path.join(self.config.data.root, 'Coauthor_CS'), 'CS')
+        elif self.config.data.task == 'Cora_Full':
+            dataset = CoraFull(os.path.join(self.config.data.root, 'Cora_Full'))
+        elif self.config.data.task == 'PubMed':
+            dataset = Planetoid(self.config.data.root, 'PubMed')
+        elif self.config.data.task == 'Cora':
+            dataset = Planetoid(self.config.data.root, 'Cora')
+        elif self.config.data.task == 'CiteSeer':
+            dataset = Planetoid(self.config.data.root, 'CiteSeer')
+        else:
+            raise NotImplementedError(f'Dataset {self.config.data.task} is not supported!')
+
+        data = dataset[0]
+        data = save_load_split(data, gen_uniform_60_20_20_split)
+        edge_index, _ = add_self_loops(data.edge_index, num_nodes=data.x.size(0))
+        data.edge_index = edge_index
+
+        self.data = {'loader': data}
 
     def updata_weight_step(self, model, data):
         start_time = time.time()
@@ -104,10 +138,8 @@ class NACInductiveSolver(InductiveSolver):
             # architecture step: optizing alpha for one epoch
             self.controller.step(data)
 
-            # skip weight step: optizing \omega
-            # but will updata subnet in finetuning phase
-            if getattr(self.config.nas, "updata_weight", False) or self.controller.subnet != None:
-                self.updata_weight_step(model, data)
+            # weight step: optizing \omega
+            self.updata_weight_step(model, data)
 
             # measure elapsed time
             self.meters.batch_time.update(time.time() - end)
@@ -326,7 +358,7 @@ def main():
 
     args = parser.parse_args()
     # build solver
-    solver = NACInductiveSolver(args.config)
+    solver = SANEInductiveSolver(args.config)
 
     # evaluate or fintune or train_search
     if args.phase in ['evaluate_subnet', 'finetune_subnet']:

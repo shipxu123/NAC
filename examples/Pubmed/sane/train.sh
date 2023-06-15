@@ -14,5 +14,5 @@ else
 fi
 
 #g=$(($NUM_GPU<8?$NUM_GPU:8))
-python3 -W ignore -u -m nac.solver.nac_induc_solver  --config=$CFG --phase train_search \
+python3 -W ignore -u -m nac.solver.sane_induc_solver  --config=$CFG --phase train_search \
   2>&1 | tee log.train.$NAME.$T

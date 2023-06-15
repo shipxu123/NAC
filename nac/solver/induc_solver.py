@@ -121,19 +121,19 @@ class InductiveSolver(BaseSolver):
             self.config.data.max_epoch = self.config.lr_scheduler.kwargs.T_max
 
         if self.config.data.task == 'Amazon_Computers':
-            dataset = Amazon('/root/data/Amazon_Computers', 'Computers')
+            dataset = Amazon(os.path.join(self.config.data.root, 'Amazon_Computers'), 'Computers')
         elif self.config.data.task == 'Coauthor_Physics':
-            dataset = Coauthor('/root/data/Coauthor_Physics', 'Physics')
+            dataset = Coauthor(os.path.join(self.config.data.root, 'Coauthor_Physics'), 'Physics')
         elif self.config.data.task == 'Coauthor_CS':
-            dataset = Coauthor('/root/data/Coauthor_CS', 'CS')
+            dataset = Coauthor(os.path.join(self.config.data.root, 'Coauthor_CS'), 'CS')
         elif self.config.data.task == 'Cora_Full':
-            dataset = CoraFull('/root/data/Cora_Full')
+            dataset = CoraFull(os.path.join(self.config.data.root, 'Cora_Full'))
         elif self.config.data.task == 'PubMed':
-            dataset = Planetoid('/root/data/', 'PubMed')
+            dataset = Planetoid(self.config.data.root, 'PubMed')
         elif self.config.data.task == 'Cora':
-            dataset = Planetoid('/root/data/', 'Cora')
+            dataset = Planetoid(self.config.data.root, 'Cora')
         elif self.config.data.task == 'CiteSeer':
-            dataset = Planetoid('/root/data/', 'CiteSeer')
+            dataset = Planetoid(self.config.data.root, 'CiteSeer')
         else:
             raise NotImplementedError(f'Dataset {self.config.data.task} is not supported!')
 

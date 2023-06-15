@@ -4,11 +4,11 @@ grad_clip: 5
 model:
     type: NACSearchSpace
     kwargs:
-        in_dim: 500
-        out_dim: 3
+        in_dim: 1433
+        out_dim: 7
         hidden_size: 32
         num_layers: 3
-        dropout: 0.6
+        dropout: 0.5
         epsilon: 0.0
         with_conv_linear: False
         fix_last: False
@@ -26,19 +26,19 @@ nas:
             subnet:
                 subnet_settings:
                     genotype_filename: ../results/searched_result.txt
-                    hidden_size: 64
-                    in_dropout: 0.5
-                    out_dropout: 0.5
+                    hidden_size: 256
+                    in_dropout: 0.6
+                    out_dropout: 0.6
                     act: relu
                     config:
                         fix_last: True
                         with_linear: False
-                        with_layernorm: False
+                        with_layernorm: True
                 optimizer:
                     type: Adam
                     kwargs:
-                        lr: 0.002408
-                        weight_decay: 0.00008850
+                        lr: 0.0004150
+                        weight_decay: 0.0001125
                 lr_scheduler:
                     type: CosineAnnealingLR
                     kwargs:
@@ -63,7 +63,8 @@ lr_scheduler:
         last_epoch: -1
 
 data:
-    task: PubMed
+    root: /mnt/home/pxu22/data/nac/
+    task: Cora
     max_epoch: 100
 
 saver:                                # saving or loading details

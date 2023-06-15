@@ -2,13 +2,13 @@ seed_base: 2
 grad_clip: 5
 
 model:
-    type: NACSearchSpace
+    type: SANESearchSpace
     kwargs:
-        in_dim: 3703
-        out_dim: 6
+        in_dim: 1433
+        out_dim: 7
         hidden_size: 32
         num_layers: 3
-        dropout: 0.6
+        dropout: 0.5
         epsilon: 0.0
         with_conv_linear: False
         fix_last: False
@@ -29,11 +29,9 @@ model:
         _SC_PRIMITIVES: ['none']
         _LA_PRIMITIVES: ['l_concat']
         with_bn: False
-        initializer: orthogonal
 
 nas:
-    type: nac
-    updata_weight: True
+    type: sane
     kwargs:
         config:
             momentum: 0.9
@@ -41,11 +39,6 @@ nas:
             arch_learning_rate: 0.0003
             arch_weight_decay: 0.001
             unrolled: False
-            sparse:
-                norm: 1
-                lambda: 4
-                sc_sparse: False
-                la_sparse: False
 
 optimizer:
     type: SGD
@@ -63,7 +56,8 @@ lr_scheduler:
         last_epoch: -1
 
 data:
-    task: CiteSeer
+    root: /mnt/home/pxu22/data/nac/
+    task: Cora
     max_epoch: 100
 
 saver:                                # saving or loading details

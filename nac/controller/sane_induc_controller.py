@@ -6,7 +6,7 @@ from torch.autograd import Variable
 
 import pdb
 
-class NACInductiveController(object):
+class SANEInductiveController(object):
 
     def __init__(self, config):
         self.config = config
@@ -48,23 +48,6 @@ class NACInductiveController(object):
         inp, target = data, Variable(data.y[data.val_mask], requires_grad=False)
         logit = self.model(inp)
         loss = self.criterion(logit[data.val_mask], target)
-
-        if getattr(self.config, 'sparse', False):
-            p = getattr(self.config.sparse, 'norm', 1)
-            _lambda = getattr(self.config.sparse, 'lambda', 0.001)
-            self.logger.info(f'original loss = {loss}')
-            if getattr(self.config.sparse, 'na_sparse', True):
-                na_reg_loss = _lambda * torch.norm(self.model.na_weights, p=p)
-                self.logger.info(f'na sparse loss = {na_reg_loss}')
-                loss += na_reg_loss
-            if getattr(self.config.sparse, 'sc_sparse', True):
-                sc_reg_loss = _lambda * torch.norm(self.model.sc_weights, p=p)
-                self.logger.info(f'sc sparse loss = {sc_reg_loss}')
-                loss += sc_reg_loss
-            if getattr(self.config.sparse, 'la_sparse', True):
-                la_reg_loss = _lambda * torch.norm(self.model.la_weights, p=p)
-                self.logger.info(f'la sparse loss = {la_reg_loss}')
-                loss += la_reg_loss
         loss.backward()
 
     def build_active_subnet(self, subnet_settings):

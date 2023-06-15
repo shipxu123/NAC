@@ -12,6 +12,21 @@ model:
         epsilon: 0.0
         with_conv_linear: False
         fix_last: False
+        _NA_PRIMITIVES: ['mlp',
+                        'gcn',
+                        'gat',
+                        'gat_sym',
+                        'gat_linear',
+                        'gat_cos',
+                        'gat_generalized_linear',
+                        'geniepath',
+                        'sage',
+                        'sage_sum',
+                        'sage_max',
+                        'gin_0',
+                        'chebconv_5',]
+        _SC_PRIMITIVES: ['none']
+        _LA_PRIMITIVES: ['l_concat']
         with_bn: False
 
 nas:
@@ -21,31 +36,13 @@ nas:
             momentum: 0.9
             weight_decay: 0.0005
             arch_learning_rate: 0.0003
-            arch_weight_decay: 0.001002
+            arch_weight_decay: 0.001
             unrolled: False
-            subnet:
-                subnet_settings:
-                    genotype_filename: ../results/searched_result.txt
-                    hidden_size: 256
-                    in_dropout: 0.6
-                    out_dropout: 0.6
-                    act: relu
-                    config:
-                        fix_last: True
-                        with_linear: False
-                        with_layernorm: True
-                optimizer:
-                    type: Adam
-                    kwargs:
-                        lr: 0.0004150
-                        weight_decay: 0.0001125
-                lr_scheduler:
-                    type: CosineAnnealingLR
-                    kwargs:
-                        T_max: 400
-                        last_epoch: -1
-                data:
-                    max_epoch: 400
+            sparse:
+                norm: 1
+                lambda: 0.5
+                sc_sparse: False
+                la_sparse: False
 
 optimizer:
     type: SGD
@@ -63,6 +60,7 @@ lr_scheduler:
         last_epoch: -1
 
 data:
+    root: /mnt/home/pxu22/data/nac/
     task: Cora
     max_epoch: 100
 
@@ -71,3 +69,5 @@ saver:                                # saving or loading details
     val_epoch_freq: 1
     val_freq: 500                    # frequence of evaluating during training
     save_many: False                   # whether to save checkpoints after every evaluation
+    # pretrain:
+    #    path: ./checkpoints/ckpt.pth.tar

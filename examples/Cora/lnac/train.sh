@@ -1,12 +1,12 @@
 #!/bin/bash
 T=`date +%m%d%H%M`
 
-ROOT=/root/codes/NAC/
+ROOT=/mnt/home/pxu22/codes/NAC
 export PYTHONPATH=$ROOT:$PYTHONPATH
 
 #PARTITION=$1
 NUM_GPU=$1
-CFG=./cora-lnac-config.yaml
+CFG=./config.yaml
 if [ -z $2 ];then
     NAME=default
 else
